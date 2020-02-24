@@ -1,11 +1,11 @@
 /* global requestAnimationFrame */
-
+const _nextFrame = typeof requestAnimationFrame !== 'undefined' ? requestAnimationFrame : setTimeout
 const _proxySet = new Set()
 const _keyMaps = new Map()
 const _triggerable = new Set()
 const _triggered = new Set()
 const _stack = []
-const _OWN_KEYS = new Symbol('treat ownKeys like an attribute')
+const _OWN_KEYS = Symbol('treat ownKeys like an attribute')
 let _handlingTriggered = false
 
 function _reportKeyMutation (target, key) {
@@ -14,7 +14,7 @@ function _reportKeyMutation (target, key) {
     if (keyMap.has(target)) {
       if (!_handlingTriggered) {
         _handlingTriggered = true
-        requestAnimationFrame(() => {
+        _nextFrame(() => {
           _handlingTriggered = false
           for (const callback of _triggered) {
             callback()
