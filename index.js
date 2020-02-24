@@ -2,35 +2,25 @@
 
 const _proxySet = new Set()
 const _keyMaps = new Map()
-const _keysMap = new WeakMap()
 const _triggerable = new Set()
 const _triggered = new Set()
 const _stack = []
+const _OWN_KEYS = new Symbol('treat ownKeys like an attribute')
 let _handlingTriggered = false
-
-
-function _handleTriggered () {
-  function dispatch () {
-    _handlingTriggered = false
-    for (const callback of _triggered) {
-      callback()
-    }
-  }
-  if (!_handlingTriggered) {
-    _handlingTriggered = true
-    if (typeof requestAnimationFrame !== 'undefined') {
-      requestAnimationFrame(dispatch)
-    } else {
-      setTimeout(dispatch)
-    }
-  }
-}
 
 function _reportKeyMutation (target, key) {
   if (_keyMaps.has(key)) {
     const keyMap = _keyMaps.get(key)
     if (keyMap.has(target)) {
-      _handleTriggered()
+      if (!_handlingTriggered) {
+        _handlingTriggered = true
+        requestAnimationFrame(() => {
+          _handlingTriggered = false
+          for (const callback of _triggered) {
+            callback()
+          }
+        })
+      }
       for (const callback of keyMap.get(target)) {
         _triggered.add(callback)
       }
@@ -42,35 +32,16 @@ function _reportKeyMutation (target, key) {
   }
 }
 
-function _reportKeysMutation (target) {
-  if (_keysMap.has(target)) {
-    _handleTriggered()
-    for (const callback of _keysMap.get(target)) {
-      _triggered.add(callback)
-    }
-    _keysMap.delete(target)
-  }
-}
-
 function _reportKeyAccess (target, key) {
   if (_stack.length) {
     if (!_keyMaps.has(key)) {
-      _keyMaps.set(key, new Map())
+      _keyMaps.set(key, new WeakMap())
     }
     const keyMap = _keyMaps.get(key)
     if (!keyMap.has(target)) {
       keyMap.set(target, new Set())
     }
     keyMap.get(target).add(_stack[0])
-  }
-}
-
-function _reportKeysAccess (target) {
-  if (_stack.length) {
-    if (!_keysMap.has(target)) {
-      _keysMap.set(target, new Set())
-    }
-    _keysMap.get(target).add(_stack[0])
   }
 }
 
@@ -89,7 +60,7 @@ export function proxy (target = {}) {
         value = proxy(value, _self)
         if (target[key] !== value) {
           if (!(key in target)) {
-            _reportKeysMutation(target)
+            _reportKeyMutation(target, _OWN_KEYS)
           }
           _reportKeyMutation(target, key)
         }
@@ -98,13 +69,13 @@ export function proxy (target = {}) {
       },
       deleteProperty (target, key) {
         if (key in target) {
-          _reportKeysMutation(target)
+          _reportKeyMutation(target, _OWN_KEYS)
           _reportKeyMutation(target, key)
         }
         return Reflect.deleteProperty(target, key)
       },
       ownKeys (target) {
-        _reportKeysAccess(target)
+        _reportKeyAccess(target, _OWN_KEYS)
         return Reflect.ownKeys(target)
       }
     })
