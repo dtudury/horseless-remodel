@@ -3,8 +3,8 @@
 const _proxySet = new Set()
 const _keyMaps = new Map()
 const _keysMap = new WeakMap()
+const _triggerable = new Set()
 const _triggered = new Set()
-const _watched = new Set()
 const _stack = []
 let _handlingTriggered = false
 
@@ -26,7 +26,7 @@ function _handleTriggered () {
   }
 }
 
-function _mutateKey (target, key) {
+function _reportKeyMutation (target, key) {
   if (_keyMaps.has(key)) {
     const keyMap = _keyMaps.get(key)
     if (keyMap.has(target)) {
@@ -42,7 +42,7 @@ function _mutateKey (target, key) {
   }
 }
 
-function _mutateKeys (target) {
+function _reportKeysMutation (target) {
   if (_keysMap.has(target)) {
     _handleTriggered()
     for (const callback of _keysMap.get(target)) {
@@ -52,7 +52,7 @@ function _mutateKeys (target) {
   }
 }
 
-function _accessKey (target, key) {
+function _reportKeyAccess (target, key) {
   if (_stack.length) {
     if (!_keyMaps.has(key)) {
       _keyMaps.set(key, new Map())
@@ -65,7 +65,7 @@ function _accessKey (target, key) {
   }
 }
 
-function _accessKeys (target) {
+function _reportKeysAccess (target) {
   if (_stack.length) {
     if (!_keysMap.has(target)) {
       _keysMap.set(target, new Set())
@@ -78,33 +78,33 @@ export function proxy (target = {}) {
   if (target instanceof Object && !_proxySet.has(target)) {
     const _self = new Proxy(Array.isArray(target) ? new Array(target.length) : {}, {
       has (target, key) {
-        _accessKey(target, key)
+        _reportKeyAccess(target, key)
         return key in target
       },
       get (target, key) {
-        _accessKey(target, key)
+        _reportKeyAccess(target, key)
         return target[key]
       },
       set (target, key, value) {
         value = proxy(value, _self)
         if (target[key] !== value) {
           if (!(key in target)) {
-            _mutateKeys(target)
+            _reportKeysMutation(target)
           }
-          _mutateKey(target, key)
+          _reportKeyMutation(target, key)
         }
         target[key] = value
         return true
       },
       deleteProperty (target, key) {
         if (key in target) {
-          _mutateKeys(target)
-          _mutateKey(target, key)
+          _reportKeysMutation(target)
+          _reportKeyMutation(target, key)
         }
         return Reflect.deleteProperty(target, key)
       },
       ownKeys (target) {
-        _accessKeys(target)
+        _reportKeysAccess(target)
         return Reflect.ownKeys(target)
       }
     })
@@ -117,18 +117,18 @@ export function proxy (target = {}) {
 
 export function watchFunction (f) {
   function wrapped () {
-    if (_watched.has(f)) {
+    if (_triggerable.has(f)) {
       _stack.unshift(wrapped)
       f()
       _stack.shift()
     }
   }
-  if (!_watched.has(f)) {
-    _watched.add(f)
+  if (!_triggerable.has(f)) {
+    _triggerable.add(f)
     wrapped()
   }
 }
 
 export function unwatchFunction (f) {
-  _watched.delete(f)
+  _triggerable.delete(f)
 }
