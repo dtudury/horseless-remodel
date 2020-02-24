@@ -1,0 +1,13 @@
+{
+  "reporter": [
+    "html",
+    "text",
+    "text-summary"
+  ],
+  "include": [
+    "index.js"
+  ],
+  "require": [
+    "esm"
+  ]
+}

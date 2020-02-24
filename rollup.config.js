@@ -8,8 +8,6 @@ export default [{
 }, {
   input: 'index.js',
   output: [{
-    file: pkg.main, format: 'cjs'
-  }, {
     file: pkg.devmodule, format: 'es'
   }]
 }]
