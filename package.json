@@ -6,7 +6,7 @@
   "module": "dist/horseless-remodel.min.esm.js",
   "devmodule": "dist/horseless-remodel.esm.js",
   "scripts": {
-    "test": "nyc _mocha --require esm",
+    "test": "nyc --reporter html --reporter text-summary _mocha --require esm",
     "prepublishOnly": "rollup -c"
   },
   "repository": {
