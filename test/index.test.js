@@ -2,6 +2,8 @@
 import { assert } from 'chai'
 import { proxy, watchFunction, unwatchFunction } from '../index.js'
 
+global.requestAnimationFrame = setTimeout
+
 function waitTicks (f, count) {
   if (!count) return f()
   setTimeout(() => waitTicks(f, count - 1))
@@ -22,19 +24,70 @@ describe('proxy', function () {
     assert.equal('a' in p, false)
     assert.equal(Object.keys(p).length, 0)
   })
-  it('should notify watching function when value changed', function (done) {
-    const p = proxy({ a: 1 })
+  it('should notify watching function when array or object changed', function (done) {
+    const p = proxy({ a: [], o: {} })
     const values = []
     let waitUntil = 0
+    function f () {
+      values.push([p.a.length, Object.keys(p.o).length])
+    }
+    watchFunction(f)
+    waitTicks(() => {
+      p.a.push(1)
+    }, ++waitUntil)
+    waitTicks(() => {
+      p.a.push(2)
+    }, ++waitUntil)
+    waitTicks(() => {
+      p.o.a = true
+    }, ++waitUntil)
+    waitTicks(() => {
+      p.o.a = false
+    }, ++waitUntil)
+    waitTicks(() => {
+      p.o.b = true
+    }, ++waitUntil)
+    waitTicks(() => {
+      p.a.push(3)
+    }, ++waitUntil)
+    waitTicks(() => {
+      delete p.o.a
+    }, ++waitUntil)
+    waitTicks(() => {
+      assert.deepEqual(values, [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [3, 2], [3, 1]])
+      done()
+    }, waitUntil + 2)
+  })
+  it('should notify watching function when value changed', function (done) {
+    const p = proxy({ a: 1, b: { a: 1 }, c: 1 })
+    const acValues = []
+    const cValues = []
+    let waitUntil = 0
     function f1 () {
-      values.push(p.a)
+      acValues.push([p.a, p.c])
+      void (p.a)
     }
     watchFunction(f1)
+    watchFunction(f1)
+    function f2 () {
+      cValues.push([p.c, p.b.a])
+    }
+    watchFunction(f2)
+    waitTicks(() => {
+      p.b.b = { a: 1 }
+    }, ++waitUntil)
+    waitTicks(() => {
+      p.b.a = 2
+      p.c = 2
+    }, ++waitUntil)
+    waitTicks(() => {
+      p.a = 1
+    }, ++waitUntil)
     waitTicks(() => {
       p.a = 2
     }, ++waitUntil)
     waitTicks(() => {
-      p.a = 2
+      p.c = 3
     }, ++waitUntil)
     waitTicks(() => {
       delete p.a
@@ -43,7 +96,14 @@ describe('proxy', function () {
       delete p.a
     }, ++waitUntil)
     waitTicks(() => {
-      assert.deepEqual(values, [1, 2, undefined])
+      unwatchFunction(f1)
+    }, ++waitUntil)
+    waitTicks(() => {
+      p.a = 4
+    }, ++waitUntil)
+    waitTicks(() => {
+      assert.deepEqual(acValues, [[1, 1], [1, 2], [2, 2], [2, 3], [undefined, 3]])
+      assert.deepEqual(cValues, [[1, 1], [2, 2], [3, 2]])
       done()
     }, waitUntil + 2)
   })

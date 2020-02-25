@@ -1,11 +1,10 @@
 /* global requestAnimationFrame */
-const _nextFrame = typeof requestAnimationFrame !== 'undefined' ? requestAnimationFrame : setTimeout
 const _proxySet = new Set()
 const _keyMaps = new Map()
 const _triggerable = new Set()
 const _triggered = new Set()
 const _stack = []
-const _OWN_KEYS = Symbol('treat ownKeys like an attribute')
+const _OWN_KEYS = Symbol('ownKeys as attribute')
 let _handlingTriggered = false
 
 function _reportKeyMutation (target, key) {
@@ -14,11 +13,12 @@ function _reportKeyMutation (target, key) {
     if (keyMap.has(target)) {
       if (!_handlingTriggered) {
         _handlingTriggered = true
-        _nextFrame(() => {
+        requestAnimationFrame(() => {
           _handlingTriggered = false
           for (const callback of _triggered) {
             callback()
           }
+          _triggered.clear()
         })
       }
       for (const callback of keyMap.get(target)) {
@@ -35,7 +35,7 @@ function _reportKeyMutation (target, key) {
 function _reportKeyAccess (target, key) {
   if (_stack.length) {
     if (!_keyMaps.has(key)) {
-      _keyMaps.set(key, new WeakMap())
+      _keyMaps.set(key, new Map())
     }
     const keyMap = _keyMaps.get(key)
     if (!keyMap.has(target)) {
@@ -53,12 +53,14 @@ export function proxy (target = {}) {
         return key in target
       },
       get (target, key) {
+        // console.log('get', key)
         _reportKeyAccess(target, key)
         return target[key]
       },
       set (target, key, value) {
-        value = proxy(value, _self)
-        if (target[key] !== value) {
+        // console.log('set', key, target)
+        value = proxy(value)
+        if (target[key] !== value || key === 'length') {
           if (!(key in target)) {
             _reportKeyMutation(target, _OWN_KEYS)
           }
