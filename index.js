@@ -53,12 +53,10 @@ export function proxy (target = {}) {
         return key in target
       },
       get (target, key) {
-        // console.log('get', key)
         _reportKeyAccess(target, key)
         return target[key]
       },
       set (target, key, value) {
-        // console.log('set', key, target)
         value = proxy(value)
         if (target[key] !== value || key === 'length') {
           if (!(key in target)) {
