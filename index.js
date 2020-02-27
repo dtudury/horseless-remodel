@@ -58,7 +58,7 @@ export function proxy (target = {}) {
       },
       set (target, key, value) {
         value = proxy(value)
-        if (target[key] !== value || key === 'length') {
+        if (target[key] !== value || key === 'length') { // array length is magical
           if (!(key in target)) {
             _reportKeyMutation(target, _OWN_KEYS)
           }
