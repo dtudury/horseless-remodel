@@ -1,6 +1,6 @@
 {
   "name": "horseless.remodel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "magical data binding",
   "keywords": ["automatic", "observe", "observer", "watch", "watcher", "bind", "binding", "data binding"],
   "main": "index.js",

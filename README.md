@@ -4,11 +4,11 @@ Magical data binding.
 
 ## Why?
 
-***horseless.h*** uses an HTML-like template language to transform a data model into browser elements. It's a neat trick, but updating the rendered page as the model changes seems unnecessarily complex for how similar the process is for every instance. ***horseless.remodel*** allows those elements to be updated continuously as the data changes. Any data that the function accessed. Automatically.
+***horseless*** uses an HTML-like template language to transform a data model into browser elements. It's a neat trick, but updating the rendered page as the model changes seems unnecessarily complex for how similar the process is for every instance. ***horseless.remodel*** allows those elements to be updated continuously as the data changes. Any data that the function accessed. Automatically.
 
 ## How does it work?
 
-***horseless.h*** exposes three methods: `remodel`, `watchFunction`, and `unwatchFunction`. 
+***horseless.remodel*** exposes three methods: `remodel`, `watchFunction`, and `unwatchFunction`. 
 
 ### `remodel(model)`
 
