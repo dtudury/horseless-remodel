@@ -1,7 +1,7 @@
 {
-  "name": "horseless-remodel",
+  "name": "horseless.remodel",
   "version": "0.0.0",
-  "description": "standalone remodel component from horseless",
+  "description": "magical data binding",
   "main": "index.js",
   "module": "dist/horseless-remodel.min.esm.js",
   "devmodule": "dist/horseless-remodel.esm.js",
