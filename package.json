@@ -1,8 +1,17 @@
 {
   "name": "horseless.remodel",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "magical data binding",
-  "keywords": ["automatic", "observe", "observer", "watch", "watcher", "bind", "binding", "data binding"],
+  "keywords": [
+    "automatic",
+    "observe",
+    "observer",
+    "watch",
+    "watcher",
+    "bind",
+    "binding",
+    "data binding"
+  ],
   "main": "index.js",
   "module": "dist/horseless-remodel.min.esm.js",
   "devmodule": "dist/horseless-remodel.esm.js",
@@ -24,7 +33,6 @@
     "acorn": "^6.4.0",
     "chai": "^4.2.0",
     "esm": "^3.2.25",
-    "istanbul": "^0.4.5",
     "mocha": "^7.0.1",
     "nyc": "^15.0.0",
     "rollup": "^1.30.1",
