@@ -1,6 +1,7 @@
 /* global describe it */
+
 import { assert } from 'chai'
-import { proxy, watchFunction, unwatchFunction } from '../index.js'
+import { proxy, watchFunction, unwatchFunction } from '../remodel.js'
 
 global.requestAnimationFrame = setTimeout
 

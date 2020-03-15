@@ -1,6 +1,6 @@
 {
   "name": "horseless.remodel",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "magical data binding",
   "keywords": [
     "automatic",
@@ -12,7 +12,7 @@
     "binding",
     "data binding"
   ],
-  "main": "index.js",
+  "main": "remodel.js",
   "module": "dist/horseless-remodel.min.esm.js",
   "devmodule": "dist/horseless-remodel.esm.js",
   "scripts": {
