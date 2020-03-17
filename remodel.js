@@ -4,6 +4,7 @@ const _keyMaps = new Map()
 const _triggerable = new Set()
 const _triggered = new Set()
 const _stack = []
+const _afterTriggered = []
 const _OWN_KEYS = Symbol('ownKeys as attribute')
 let _handlingTriggered = false
 
@@ -19,6 +20,9 @@ function _reportKeyMutation (target, key) {
             callback()
           }
           _triggered.clear()
+          while (_afterTriggered.length) {
+            _afterTriggered.shift()()
+          }
         })
       }
       for (const callback of keyMap.get(target)) {
@@ -102,4 +106,8 @@ export function watchFunction (f) {
 
 export function unwatchFunction (f) {
   _triggerable.delete(f)
+}
+
+export function after (f) {
+  _afterTriggered.push(f)
 }

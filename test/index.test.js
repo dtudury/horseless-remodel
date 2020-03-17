@@ -1,7 +1,7 @@
 /* global describe it */
 
 import { assert } from 'chai'
-import { proxy, watchFunction, unwatchFunction } from '../remodel.js'
+import { proxy, watchFunction, unwatchFunction, after } from '../remodel.js'
 
 global.requestAnimationFrame = setTimeout
 
@@ -105,6 +105,37 @@ describe('proxy', function () {
     waitTicks(() => {
       assert.deepEqual(acValues, [[1, 1], [1, 2], [2, 2], [2, 3], [undefined, 3]])
       assert.deepEqual(cValues, [[1, 1], [2, 2], [3, 2]])
+      done()
+    }, waitUntil + 2)
+  })
+  it('should handle after events', function (done) {
+    let waitUntil = 0
+    const p = proxy()
+    const logs = []
+    watchFunction(() => {
+      logs.push(`x: ${p.x}`)
+    })
+    watchFunction(() => {
+      logs.push(`keys: ${JSON.stringify(Object.keys(p))}`)
+    })
+    after(() => {
+      logs.push(`after ${JSON.stringify(p)}`)
+    })
+    waitTicks(() => {
+      p.x = 1
+    }, ++waitUntil)
+    waitTicks(() => {
+      p.x = 2
+    }, ++waitUntil)
+    waitTicks(() => {
+      assert.deepEqual(logs, [
+        'x: undefined',
+        'keys: []',
+        'keys: ["x"]',
+        'x: 1',
+        'after {"x":1}',
+        'x: 2'
+      ])
       done()
     }, waitUntil + 2)
   })
