@@ -8,7 +8,7 @@ Magical data binding.
 
 ## How does it work?
 
-***horseless.remodel*** exposes three methods: `remodel`, `watchFunction`, and `unwatchFunction`. 
+***horseless.remodel*** exposes four methods: `remodel`, `watchFunction`, `unwatchFunction`, and `after`. 
 
 ### `remodel(model)`
 
@@ -22,11 +22,14 @@ Magical data binding.
 
 `unwatchFunction` removes the function it's passed from the list of valid listeners
 
+### `after(f)`
+
+`after` adds a one time callback for after the current round of watched functions have executed
 
 ## Usage
 
 ```
-import { remodel, watchFunction, unwatchFunction } from 'horseless.remodel'
+import { remodel, watchFunction } from 'horseless.remodel'
 
 const model = remodel({ name:'Theon' })
 
@@ -40,6 +43,8 @@ setTimeout(() => {
   model.name = 'Reek'
 }, 5000)
 ```
+
+Result: "Hello Theon" is displayed for five seconds after which "Hello Reek" is displayed
 
 ## everything else
 This repo contains about a hundred lines of pretty straight-forward code. Please take a peak in `index.js`. If you have questions or suggestions, I'd love to hear from you!
