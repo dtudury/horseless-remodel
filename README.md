@@ -4,7 +4,7 @@ Magical data binding.
 
 ## Why?
 
-***horseless*** uses an HTML-like template language to transform a data model into browser elements. It's a neat trick, but updating the rendered page as the model changes seems unnecessarily complex for how similar the process is for every instance. ***horseless.remodel*** allows those elements to be updated continuously as the data changes. Any data that the function accessed. Automatically.
+We have our model. We build something based on the model. The model changes, we do it all again. It changes again, we remember that we're programmers and we automate... Then we build something else based on the model. And then something *else*. Can't we just say "whenever we do **anything** with the model automate it, like forever?
 
 ## How does it work?
 
@@ -47,4 +47,4 @@ setTimeout(() => {
 Result: "Hello Theon" is displayed for five seconds after which "Hello Reek" is displayed
 
 ## everything else
-This repo contains about a hundred lines of pretty straight-forward code. Please take a peak in `index.js`. If you have questions or suggestions, I'd love to hear from you!
+This repo contains about a hundred lines of pretty straight-forward code. Please take a peak in `remodel.js`. If you have questions or suggestions, I'd love to hear from you!
