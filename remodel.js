@@ -50,8 +50,10 @@ function _reportKeyAccess (target, key) {
 }
 
 export function proxy (target = {}) {
-  if (target instanceof Object && !_proxySet.has(target)) {
-    const _self = new Proxy(Array.isArray(target) ? new Array(target.length) : {}, {
+  const isArray = Array.isArray(target)
+  const isObject = target.constructor === Object
+  if ((isArray || isObject) && !_proxySet.has(target)) {
+    const _self = new Proxy(isArray ? new Array(target.length) : {}, {
       has (target, key) {
         _reportKeyAccess(target, key)
         return key in target
