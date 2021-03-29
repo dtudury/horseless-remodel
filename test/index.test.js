@@ -139,4 +139,11 @@ describe('proxy', function () {
       done()
     }, waitUntil + 2)
   })
+  it('should not fail on null values', function (done) {
+    assert.doesNotThrow(() => {
+      const p = proxy()
+      p.x = null
+    })
+    done()
+  })
 })
